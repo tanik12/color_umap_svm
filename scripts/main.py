@@ -6,6 +6,8 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 import umap
 import pickle
+from io import BytesIO
+from PIL import Image
 
 from skimage.color import rgb2lab
 import sys
@@ -59,6 +61,8 @@ def plot(tmp, label_arrays, component_num=3):
         ax.set_xlabel("component1")
         ax.set_ylabel("component2")
         ax.set_zlabel("component3")
+
+        gif_flag = False
         
         for idx, label in enumerate(label_arrays):
             label = label.astype(int)
@@ -70,6 +74,12 @@ def plot(tmp, label_arrays, component_num=3):
                 ax.scatter(tmp.embedding_[idx, 0], tmp.embedding_[idx, 1], tmp.embedding_[idx, 2], c="yellow", s = 10)
             else:
                 ax.scatter(tmp.embedding_[idx, 0], tmp.embedding_[idx, 1], tmp.embedding_[idx, 2], c="black", s = 10)
+
+        if gif_flag:
+            for angle in range(0, 360):
+                ax.view_init(30, angle)
+                plt.savefig("figs/{0}_{1:03d}.jpg".format("res", angle))
+
     elif component_num == 2:
         plt.scatter(tmp.embedding_[:, 0], tmp.embedding_[:, 1], c=label_arrays, s = 10)
 
@@ -117,7 +127,7 @@ if __name__ == '__main__':
     ########################
     ######学習済みモデルへのinput data
     #X_train, X_test, y_train, y_test = train_test_split(trans.embedding_, label_arrays, test_size=0.4, random_state=12) #102~110がコメントアウトされてたらこの行はコメントアウトしないこと
-    #plot(trans, label_arrays) #Debug用 可視化
+    plot(trans, label_arrays) #Debug用 可視化
 
     ######推論
     output_proba = svc.predict_proba(X_train)
