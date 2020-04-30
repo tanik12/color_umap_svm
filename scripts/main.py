@@ -20,7 +20,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 def load_model(model_name):
     try:
-        with open("./model/"+ model_name +".pickle", mode='rb') as fp:
+        with open("../model/"+ model_name +".pickle", mode='rb') as fp:
             clf = pickle.load(fp)
             return clf
     except FileNotFoundError as e:
@@ -42,7 +42,7 @@ def train_model(model_name, feature_space="None"):
         sys.exit()
 
 def save_model(model_name, train_obj):
-    with open("./model/" + model_name + ".pickle", mode='wb') as fp:
+    with open("../model/" + model_name + ".pickle", mode='wb') as fp:
         pickle.dump(train_obj, fp)
 
 def color_inference(x_train, model):
@@ -78,7 +78,7 @@ def plot(tmp, label_arrays, component_num=3):
         if gif_flag:
             for angle in range(0, 180):
                 ax.view_init(30, angle*2)
-                plt.savefig("figs/{0}_{1:03d}.jpg".format("res", angle))
+                plt.savefig("../pictures/figs/{0}_{1:03d}.jpg".format("res", angle))
 
     elif component_num == 2:
         plt.scatter(tmp.embedding_[:, 0], tmp.embedding_[:, 1], c=label_arrays, s = 10)
