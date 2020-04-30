@@ -76,8 +76,8 @@ def plot(tmp, label_arrays, component_num=3):
                 ax.scatter(tmp.embedding_[idx, 0], tmp.embedding_[idx, 1], tmp.embedding_[idx, 2], c="black", s = 10)
 
         if gif_flag:
-            for angle in range(0, 360):
-                ax.view_init(30, angle)
+            for angle in range(0, 180):
+                ax.view_init(30, angle*2)
                 plt.savefig("figs/{0}_{1:03d}.jpg".format("res", angle))
 
     elif component_num == 2:
