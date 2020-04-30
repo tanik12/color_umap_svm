@@ -1,3 +1,4 @@
+import os
 import sys
 import numpy as np
 from skimage.color import rgb2lab
@@ -6,12 +7,14 @@ from sklearn.model_selection import train_test_split
 from utils.data_loader import load_image
 from utils.ml_func import load_model, train_model, save_model, color_inference
 from utils.visualize import plot
+from utils.evaluation import eval_confusion_matrix
 
 def main():
     ########################
     #input dataの作成
     #RGB
-    img, label_arrays, image_hsv = load_image("/Users/gisen/git/color_clustering/data_evaluation")
+    data_path = os.path.dirname(os.getcwd()) + "/data_evaluation"
+    img, label_arrays, image_hsv = load_image(data_path)
     print("教師ラベルの総数: ", label_arrays.shape)
 
     #labに変換(RGB->lab)
@@ -51,7 +54,7 @@ def main():
     plot(trans, label_arrays) #Debug用 可視化
 
     ######推論
-    output_proba = svc.predict_proba(X_train)
+    output_proba = svc.predict_proba(X_test)
     max_index = np.argmax(output_proba, axis=1).astype('int') #predict class
 
     tmp = np.empty((0,4), int)
@@ -61,19 +64,20 @@ def main():
         test[idx] = 1
         tmp = np.append(tmp, np.array([test]), axis=0)
 
+    max_index_pre = max_index
     max_index = max_index[:, np.newaxis]
-
     #ここ違う方法でやった方がいいかも
     proba_array = np.array([output_proba[i, max_index[i]] for i in range(output_proba.shape[0])])
     proba_array = np.hstack((proba_array, max_index.reshape(-1,1)))
-    print(proba_array)
+    #print(proba_array) #debug
     ########################
 
     ########################
     ######評価
     print("============")
-    print("dataの総数: ", X_test.shape[0])
+    print("test_dataの総数: ", X_test.shape[0])
     print("SVM:", svc.score(X_test, y_test))
+    eval_confusion_matrix(y_test, max_index_pre)
     ########################
 
 if __name__ == '__main__':
