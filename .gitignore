@@ -1,3 +1,4 @@
 *.pyc
-./.DS_Store
-.vscode
+*.DS_Store
+*.vscode
+pictures/figs
