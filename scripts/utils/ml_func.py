@@ -17,6 +17,7 @@ def train_model(model_name, train_data="None", tl_data="None"):
         if 'umap' in model_name:
             component_num = 3
             trained_model = umap.UMAP(n_neighbors=80, n_components=component_num, min_dist=0.4, metric='cosine',random_state=12).fit(train_data) #たぶんこれがよい
+            ####trained_model = umap.UMAP(n_neighbors=80, n_components=component_num, min_dist=0.4, metric='cosine',random_state=12).fit(train_data) #たぶんこれがよい
         elif 'svm' in model_name:
             trained_model = SVC(probability=True).fit(train_data, tl_data)
 
