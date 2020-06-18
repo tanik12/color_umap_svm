@@ -44,3 +44,5 @@ def eval_confusion_matrix(tl_label, pre_res):
     sns.heatmap(cm, annot=True, square=True, cmap='Blues')
     plt.ylim(0, cm.shape[0])
     plt.savefig(os.path.dirname(os.getcwd()) + "/pictures/sklearn_confusion_matrix_annot_blues.png")
+    plt.show()
+    plt.close()
