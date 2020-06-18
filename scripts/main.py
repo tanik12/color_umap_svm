@@ -45,7 +45,7 @@ def main():
 
     ########################
     #train, test dataに分割
-    X_train, X_test, y_train, y_test = train_test_split(img_train, label_arrays, test_size=0.2, random_state=19)
+    X_train, X_test, y_train, y_test = train_test_split(img_train, label_arrays, test_size=0.1, random_state=19)
     ########################
 
     ########################
@@ -55,11 +55,11 @@ def main():
     X_train222 = trans.embedding_
     y_train = y_train
 
-    svc = train_model("model_svm", train_data=X_train222, tl_data=y_train)
-
-    # 学習済みモデルを保存する
-    save_model("model_umap", trans)
-    save_model("model_svm", svc)
+#    svc = train_model("model_svm", train_data=X_train222, tl_data=y_train)
+#
+#    # 学習済みモデルを保存する
+#    save_model("model_umap", trans)
+#    save_model("model_svm", svc)
     
     # 保存したモデルをロードする
     trans = load_model("model_umap")
@@ -94,7 +94,8 @@ def main():
     print("============")
     print("test_dataの総数: ", X_test222.shape[0])
     print("SVM:", svc.score(X_test222, y_test))
-    eval_confusion_matrix(y_test, max_index_pre)
+    ###eval_confusion_matrix(y_test, max_index_pre)
+    sys.exit()
     ####################
 
     ########################
@@ -110,17 +111,18 @@ def main():
 
     ### umap空間をDNNにより学習
     net = Net()
-    net.train_umap(net, train_dataset)
+    #net.train_umap(net, train_dataset)
 
     ### model load
-    net.load_state_dict(torch.load("/Users/gisen/git/color_umap_svm/model/dnn_umap.pth"))
     net.eval()
+    net.load_state_dict(torch.load("/Users/gisen/git/color_umap_svm/model/dnn_umap.pth"))
 
     ### DNNにより推論
     outputs = net(input_test.float())
     outputs = outputs.to('cpu').detach().numpy().copy()
     plot(outputs, np.array(target_test))
     plot(X_test222, np.array(target_test))
+
     ########################
 
 if __name__ == '__main__':

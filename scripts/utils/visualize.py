@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-def plot(tmp, label_arrays, component_num=2):
+def plot(tmp, label_arrays, component_num=3):
     if component_num == 3:
         #グラフの枠を作っていく
         fig = plt.figure()
@@ -35,8 +35,10 @@ def plot(tmp, label_arrays, component_num=2):
 
     elif component_num == 2:
         plt.scatter(tmp[:, 0], tmp[:, 1], c=label_arrays, s = 10)
+        plt.xlim(-20,20)
+        plt.ylim(-20,20)
         #plt.scatter(tmp.embedding_[:, 0], tmp.embedding_[:, 1], c=label_arrays, s = 10)
-
+        plt.show()
     plt.show()
     plt.close()
 
