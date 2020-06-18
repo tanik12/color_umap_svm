@@ -13,7 +13,8 @@ def load_image(image_file):
     for i in file_name_lists:
         img = cv2.imread(image_file+'/'+i)
         height, width, channels = img.shape[:3]
-        if height >= 75 or width >= 75:
+        #if height >= 75 or width >= 75:
+        if height >= 24 or width >= 24:
             image_bgr.append(img)
             label_arrays.append(i)
         else:

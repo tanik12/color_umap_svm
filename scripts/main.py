@@ -9,6 +9,17 @@ from utils.ml_func import load_model, train_model, save_model, color_inference
 from utils.visualize import plot
 from utils.evaluation import eval_confusion_matrix
 
+##########
+from utils.dnn_learned_umap import Net
+from utils.dnn_inference_umap import ColorNet
+from utils.data_loader_pytorch import Dataset
+import torch
+import torchvision.transforms as transforms
+from torch.autograd import Variable
+import torch.nn as nn
+import torch.nn.functional as F
+##########
+
 def main():
     ########################
     #input dataの作成
@@ -28,33 +39,44 @@ def main():
     img[:, :, :, 0] = np.sqrt(img[:, :, :, 0])
     img[:, :, :, 1] = np.square(img[:, :, :, 1])
     img[:, :, :, 2] = np.square(img[:, :, :, 2])
+    #img = (img[:, :, :, 0] + img[:, :, :, 1] + img[:, :, :, 2]) / 3
     
     img_train = np.reshape(img, (len(img),-1))
     ########################
 
     ########################
+    #train, test dataに分割
+    X_train, X_test, y_train, y_test = train_test_split(img_train, label_arrays, test_size=0.1, random_state=19)
+    ########################
+
+    ########################
     ######umapとsvmのobjectを作成
     # モデルの学習
-    trans = train_model("model_umap", train_data=img_train)
-    X_train, X_test, y_train, y_test = train_test_split(trans.embedding_, label_arrays, test_size=0.4, random_state=12)
-    svc = train_model("model_svm", train_data=X_train, tl_data=y_train)
+    trans = train_model("model_umap", train_data=X_train)
+    X_train222 = trans.embedding_
+    y_train = y_train
 
-    # 学習済みモデルを保存する
-    save_model("model_umap", trans)
-    save_model("model_svm", svc)
+#    svc = train_model("model_svm", train_data=X_train222, tl_data=y_train)
+#
+#    # 学習済みモデルを保存する
+#    save_model("model_umap", trans)
+#    save_model("model_svm", svc)
     
     # 保存したモデルをロードする
     trans = load_model("model_umap")
     svc = load_model("model_svm")
+
+    #test dataの作成
+    X_test222 = trans.transform(X_test)
     ########################
 
     ########################
-    ######学習済みモデルへのinput data
-    #X_train, X_test, y_train, y_test = train_test_split(trans.embedding_, label_arrays, test_size=0.4, random_state=12) #102~110がコメントアウトされてたらこの行はコメントアウトしないこと
-    plot(trans, label_arrays) #Debug用 可視化
-
     ######推論
-    output_proba = svc.predict_proba(X_test)
+    print("aaaa: ", X_test[0:5])
+    ##np.save('test_data', X_test[0:5])
+    print(X_test222[0:5])
+    ###sys.exit()
+    output_proba = svc.predict_proba(X_test222)
     max_index = np.argmax(output_proba, axis=1).astype('int') #predict class
 
     tmp = np.empty((0,4), int)
@@ -72,12 +94,40 @@ def main():
     #print(proba_array) #debug
     ########################
 
-    ########################
-    ######評価
+    ####################
+    ##評価
     print("============")
-    print("test_dataの総数: ", X_test.shape[0])
-    print("SVM:", svc.score(X_test, y_test))
-    eval_confusion_matrix(y_test, max_index_pre)
+    print("test_dataの総数: ", X_test222.shape[0])
+    print("SVM:", svc.score(X_test222, y_test))
+    ###eval_confusion_matrix(y_test, max_index_pre)
+    ###sys.exit()
+    ####################
+
+    ########################
+    #umap空間を学習させるための準備
+    #train data用のデータ
+    input = torch.from_numpy(X_train)
+    target = torch.from_numpy(X_train222)
+    
+    #test data用のデータ
+    input_test = torch.from_numpy(X_test)
+    target_test = torch.from_numpy(y_test)
+    train_dataset = Dataset(input, target, transform=None)
+
+    ### umap空間をDNNにより学習
+    net = Net()
+    #net.train_umap(net, train_dataset)
+
+    ### model load
+    net.eval()
+    net.load_state_dict(torch.load("/Users/gisen/git/color_umap_svm/model/dnn_umap.pth"))
+
+    ### DNNにより推論
+    outputs = net(input_test.float())
+    outputs = outputs.to('cpu').detach().numpy().copy()    
+    plot(outputs, np.array(target_test))
+    plot(X_test222, np.array(target_test))
+
     ########################
 
 if __name__ == '__main__':

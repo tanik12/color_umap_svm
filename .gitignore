@@ -3,3 +3,9 @@
 *.vscode
 pictures/figs
 data_evaluation
+
+pictures
+.python-version
+inference_test.py
+test_data.npy
+test_img.npy
