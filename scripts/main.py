@@ -124,17 +124,7 @@ def main():
 
     ### DNNにより推論
     outputs = net(input_test.float())
-    outputs = outputs.to('cpu').detach().numpy().copy()
-    print(input_test.shape, type(input_test))
-    sys.exit()
-    #######
-    #推論
-    ###net = ColorNet()
-    ###net.load_state_dict(torch.load("/Users/gisen/git/color_umap_svm/model/dnn_umap.pth"))
-    ###get_feature = inference(net, input_test)
-    #######
-
-    
+    outputs = outputs.to('cpu').detach().numpy().copy()    
     plot(outputs, np.array(target_test))
     plot(X_test222, np.array(target_test))
 
