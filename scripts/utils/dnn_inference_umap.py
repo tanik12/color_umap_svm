@@ -3,6 +3,7 @@ import torch #基本モジュール
 import torch.nn as nn #ネットワーク構築用
 from utils.ml_func import load_model
 import torch.nn.functional as F #ネットワーク用の様々な関数
+from skimage.color import rgb2lab
 
 class ColorNet(nn.Module):
     def __init__(self):
@@ -29,6 +30,24 @@ class ColorNet(nn.Module):
     def get_color_model(self):
         color_model = load_model("model_svm")
         return color_model
+
+    def input_preprocessing(self, img): #imgのshape -->> (n, 24, 24, 3)
+        #labに変換(RGB->lab)
+        img = np.array(img)[:, :, :, :].astype('float32')
+        img = rgb2lab(img) # lab値に変換
+        #正規化処理
+        img[:, :, :, 0] /= 100
+        img[:, :, :, 1] /= 128
+        img[:, :, :, 2] /= 128
+        #さらにlab値を変換
+        img[:, :, :, 0] = np.sqrt(img[:, :, :, 0])
+        img[:, :, :, 1] = np.square(img[:, :, :, 1])
+        img[:, :, :, 2] = np.square(img[:, :, :, 2])
+        #img = (img[:, :, :, 0] + img[:, :, :, 1] + img[:, :, :, 2]) / 3
+        
+        input_data = np.reshape(img, (len(img),-1))
+
+        return input_data  #imgのshape -->> (n, 1728)
 
     def inference_color(self, X_test222):
         output_proba = self.color_model.predict_proba(X_test222)
