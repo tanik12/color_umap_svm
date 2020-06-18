@@ -11,6 +11,7 @@ from utils.evaluation import eval_confusion_matrix
 
 ##########
 from utils.dnn_learned_umap import Net
+from utils.dnn_inference_umap import ColorNet
 from utils.data_loader_pytorch import Dataset
 import torch
 import torchvision.transforms as transforms
@@ -71,6 +72,10 @@ def main():
 
     ########################
     ######推論
+    print("aaaa: ", X_test[0:5])
+    ##np.save('test_data', X_test[0:5])
+    print(X_test222[0:5])
+    ###sys.exit()
     output_proba = svc.predict_proba(X_test222)
     max_index = np.argmax(output_proba, axis=1).astype('int') #predict class
 
@@ -95,7 +100,7 @@ def main():
     print("test_dataの総数: ", X_test222.shape[0])
     print("SVM:", svc.score(X_test222, y_test))
     ###eval_confusion_matrix(y_test, max_index_pre)
-    sys.exit()
+    ###sys.exit()
     ####################
 
     ########################
@@ -120,6 +125,16 @@ def main():
     ### DNNにより推論
     outputs = net(input_test.float())
     outputs = outputs.to('cpu').detach().numpy().copy()
+    print(input_test.shape, type(input_test))
+    sys.exit()
+    #######
+    #推論
+    ###net = ColorNet()
+    ###net.load_state_dict(torch.load("/Users/gisen/git/color_umap_svm/model/dnn_umap.pth"))
+    ###get_feature = inference(net, input_test)
+    #######
+
+    
     plot(outputs, np.array(target_test))
     plot(X_test222, np.array(target_test))
 
