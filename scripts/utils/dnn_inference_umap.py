@@ -49,6 +49,13 @@ class ColorNet(nn.Module):
 
         return input_data  #imgのshape -->> (n, 1728)
 
+    def get_color_feature(self, obj, img):
+        input_img = self.input_preprocessing(img)
+        input_test = torch.from_numpy(input_img)
+        outputs = obj(input_test.float())    
+        outputs = outputs.to('cpu').detach().numpy().copy()
+        return outputs
+
     def inference_color(self, X_test222):
         output_proba = self.color_model.predict_proba(X_test222)
         max_index = np.argmax(output_proba, axis=1).astype('int') #predict class

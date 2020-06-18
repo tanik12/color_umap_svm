@@ -11,15 +11,10 @@ def main():
 
     #data load
     img = np.load('test_img.npy')
-
     #dimension compression. express umap as dnn.
-    input_img = net.input_preprocessing(img)
-    input_test = torch.from_numpy(input_img)
-    outputs = net(input_test.float())    
-    outputs = outputs.to('cpu').detach().numpy().copy()
-    
+    outputs_3dim = net.get_color_feature(net, img)
     #color inference
-    pre = net.inference_color(outputs)
+    pre = net.inference_color(outputs_3dim)
     print(pre)
     
 if __name__ == '__main__':
