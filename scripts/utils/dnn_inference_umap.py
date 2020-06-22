@@ -1,7 +1,8 @@
 import numpy as np
 import torch #基本モジュール
 import torch.nn as nn #ネットワーク構築用
-from utils.ml_func import load_model
+#from utils.ml_func import load_model
+import pickle
 import torch.nn.functional as F #ネットワーク用の様々な関数
 from skimage.color import rgb2lab
 
@@ -28,8 +29,17 @@ class ColorNet(nn.Module):
         return x
 
     def get_color_model(self):
-        color_model = load_model("model_svm")
-        return color_model
+        try:
+            with open("../model/model_svm.pickle", mode='rb') as fp:
+                clf = pickle.load(fp)
+                return clf
+        except FileNotFoundError as e:
+            print("Do not exist model file! Please make model file.", e)
+            sys.exit()
+
+
+        ###color_model = load_model("model_svm")
+        ###return color_model
 
     def input_preprocessing(self, img): #imgのshape -->> (n, 24, 24, 3)
         #labに変換(RGB->lab)
